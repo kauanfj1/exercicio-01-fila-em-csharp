@@ -1,0 +1,103 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+class Cliente
+{
+    public string Nome { get; set; }
+    public DateTime DataHoraEntrada { get; set; }
+}
+
+class Funcionario
+{
+    public string Nome { get; set; }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Queue<Cliente> fila = new Queue<Cliente>();
+        List<Funcionario> funcionarios = new List<Funcionario>
+        {
+            new Funcionario { Nome = "Funcionário 1:" },
+            new Funcionario { Nome = "Funcionário 2:" },
+            new Funcionario { Nome = "Funcionário 3:" },
+            new Funcionario { Nome = "Funcionário 4:" },
+            new Funcionario { Nome = "Funcionário 5:" },
+            new Funcionario { Nome = "Funcionário 6:" },
+            new Funcionario { Nome = "Funcionário 7:" },
+            new Funcionario { Nome = "Funcionário 8:" },
+            new Funcionario { Nome = "Funcionário 9:" }
+        };
+
+        Random random = new Random();
+        int tempoDeEsperaTotal = 0;
+
+        while (true)
+        {
+            Console.WriteLine("1 - Adicionar cliente na fila");
+            Console.WriteLine("2 - Iniciar atendimento automático");
+            Console.WriteLine("3 - Sair");
+            Console.Write("Escolha uma opção: ");
+            int opcao = int.Parse(Console.ReadLine());
+
+            switch (opcao)
+            {
+                case 1:
+                    Console.Write("Quantos clientes deseja adicionar à fila: ");
+                    int numeroClientes = int.Parse(Console.ReadLine());
+
+                    for (int i = 0; i < numeroClientes; i++)
+                    {
+                        Cliente novoCliente = new Cliente
+                        {
+                            Nome = "Cliente " + (fila.Count + 1),
+                            DataHoraEntrada = DateTime.Now
+                        };
+                        fila.Enqueue(novoCliente);
+                        Console.WriteLine($"{novoCliente.DataHoraEntrada.ToString("dd/MM/yyyy HH:mm:ss")} : {novoCliente.Nome} cliente entrou na fila de espera.");
+                    }
+
+                    // Exibe a mensagem de início do atendimento automático após adicionar clientes à fila
+                    Console.WriteLine("Iniciando atendimento automático...");
+
+                    break;
+
+                case 2:
+                    if (fila.Count == 0)
+                    {
+                        Console.WriteLine("A fila de espera está vazia. Não há clientes para atender.");
+                        continue;
+                    }
+
+                    Console.WriteLine("Iniciando atendimento automático...");
+
+                    while (fila.Count > 0)
+                    {
+                        Cliente clienteAtendido = fila.Dequeue();
+                        Funcionario funcionario = funcionarios[random.Next(funcionarios.Count)];
+                        int tempoAtendimento = random.Next(1, 11); // Tempo de atendimento aleatório de 1 a 10 segundos
+                        tempoDeEsperaTotal += tempoAtendimento;
+
+                        DateTime dataHoraAtendimento = DateTime.Now;
+                        Console.WriteLine($"{dataHoraAtendimento.ToString("dd/MM/yyyy HH:mm:ss")}: Atendendo {clienteAtendido.Nome}...");
+                        Thread.Sleep(tempoAtendimento * 1000); // Espera em milissegundos
+                        Console.WriteLine($"{dataHoraAtendimento.ToString("dd/MM/yyyy HH:mm:ss")}: {clienteAtendido.Nome} atendido pelo {funcionario.Nome} com o tempo de {tempoAtendimento} segundos.");
+                    }
+                    Console.WriteLine($"Tempo de espera total: {tempoDeEsperaTotal} segundos.");
+                    Console.WriteLine("Encerrando o sistema de atendimento.");
+                    return;
+
+                case 3:
+                    Console.WriteLine("Encerrando o sistema de atendimento.");
+                    return;
+
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    break;
+            }
+        }
+    }
+}
+
